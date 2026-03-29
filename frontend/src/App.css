@@ -1,0 +1,433 @@
+/* ============================================================================
+   PROFESSIONAL CODE QUALITY ANALYZER - DESIGN SYSTEM
+   ============================================================================ */
+
+/* Color Palette */
+:root {
+  --primary: #1e40af;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e3a8a;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --neutral-50: #f9fafb;
+  --neutral-100: #f3f4f6;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-500: #6b7280;
+  --neutral-700: #374151;
+  --neutral-900: #111827;
+  --surface: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
+  color: var(--neutral-900);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: white;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  pointer-events: none;
+}
+
+.header-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header-title h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.header-title .subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+  font-weight: 300;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================================================
+   NAVIGATION
+   ============================================================================ */
+
+.navigation {
+  background: var(--surface);
+  border-bottom: 1px solid var(--neutral-200);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  gap: 0;
+}
+
+.nav-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--neutral-600);
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+
+.nav-button:hover {
+  background: var(--neutral-50);
+  color: var(--primary);
+}
+
+.nav-button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+  display: inline-block;
+}
+
+.nav-label {
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .nav-button {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .nav-label {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   ALERTS
+   ============================================================================ */
+
+.alert {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border-left: 4px solid;
+}
+
+.alert-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.alert-content strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
+.alert-content p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border-left-color: var(--danger);
+  color: #7f1d1d;
+}
+
+.alert-error strong {
+  color: #991b1b;
+}
+
+.alert-warning {
+  background: #fffbeb;
+  border-left-color: var(--warning);
+  color: #78350f;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  border-left-color: var(--success);
+  color: #15803d;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 3px solid var(--neutral-200);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ============================================================================
+   MAIN CONTAINER
+   ============================================================================ */
+
+.container {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.content {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--neutral-200);
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ============================================================================
+   SECTIONS
+   ============================================================================ */
+
+.input-section,
+.analysis-section,
+.prediction-section {
+  background: var(--neutral-50);
+  padding: 28px;
+  border-radius: 10px;
+  border-left: 4px solid;
+  border-left-color: var(--primary);
+}
+
+.analysis-section {
+  border-left-color: var(--success);
+}
+
+.prediction-section {
+  border-left-color: var(--warning);
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--neutral-900);
+}
+
+.section-description {
+  font-size: 0.95rem;
+  color: var(--neutral-600);
+  margin-bottom: 20px;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  background: var(--neutral-900);
+  color: var(--neutral-400);
+  text-align: center;
+  padding: 32px 20px;
+  border-top: 1px solid var(--neutral-800);
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+}
+
+.footer-meta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-top: 8px;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .header-title h1 {
+    font-size: 2.5rem;
+  }
+
+  .container {
+    padding: 30px 15px;
+  }
+
+  .content {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 40px 20px;
+  }
+
+  .header-title h1 {
+    font-size: 2rem;
+  }
+
+  .header-title .subtitle {
+    font-size: 1rem;
+  }
+
+  .container {
+    padding: 20px 12px;
+  }
+
+  .content {
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .input-section,
+  .analysis-section,
+  .prediction-section {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 30px 16px;
+  }
+
+  .header-title h1 {
+    font-size: 1.75rem;
+  }
+
+  .header-title .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .container {
+    padding: 16px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .input-section,
+  .analysis-section,
+  .prediction-section {
+    padding: 16px;
+  }
+
+  .footer-content p {
+    font-size: 0.85rem;
+  }
+}
+
