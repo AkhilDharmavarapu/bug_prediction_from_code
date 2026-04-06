@@ -4,6 +4,7 @@ import CodeInput from './components/CodeInput';
 import MetricsInput from './components/MetricsInput';
 import PredictionResult from './components/PredictionResult';
 import AnalysisResult from './components/AnalysisResult';
+import { API_BASE_URL } from './config';
 
 function App() {
   const [activeTab, setActiveTab] = useState('code');
@@ -19,7 +20,7 @@ function App() {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/analyze-code', {
+      const response = await fetch(`${API_BASE_URL}/analyze-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code })
@@ -47,7 +48,7 @@ function App() {
     setCurrentMetrics(metrics);
     
     try {
-      const response = await fetch('http://localhost:8000/predict', {
+      const response = await fetch(`${API_BASE_URL}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(metrics)

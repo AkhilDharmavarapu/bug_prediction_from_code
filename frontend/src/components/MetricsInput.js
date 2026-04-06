@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './MetricsInput.css';
+import { API_BASE_URL } from '../config';
 
 function MetricsInput({ onPredict }) {
   const [metrics, setMetrics] = useState({
@@ -27,7 +28,7 @@ function MetricsInput({ onPredict }) {
     
     setExtracting(true);
     try {
-      const response = await fetch('http://localhost:8000/analyze-code', {
+      const response = await fetch(`${API_BASE_URL}/analyze-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: extractCode })
