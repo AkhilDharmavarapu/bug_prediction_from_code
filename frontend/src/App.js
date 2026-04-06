@@ -107,25 +107,25 @@ function App() {
         </div>
       </nav>
 
-      <main className="container">
-        {error && (
-          <div className="alert alert-error">
-            <div className="alert-icon">⚠️</div>
-            <div className="alert-content">
-              <strong>Unable to Process</strong>
-              <p>{error}</p>
+      <main className="main-container">
+        <div className="content-wrapper">
+          {error && (
+            <div className="alert alert-error">
+              <div className="alert-icon">⚠️</div>
+              <div className="alert-content">
+                <strong>Unable to Process</strong>
+                <p>{error}</p>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {loading && (
-          <div className="loading-overlay">
-            <div className="spinner"></div>
-            <p className="loading-text">Analyzing code quality...</p>
-          </div>
-        )}
+          )}
+          
+          {loading && (
+            <div className="loading-overlay">
+              <div className="spinner"></div>
+              <p className="loading-text">Analyzing code quality...</p>
+            </div>
+          )}
 
-        <div className="content">
           {activeTab === 'code' ? (
             <div className="tab-content">
               <div className="input-section">

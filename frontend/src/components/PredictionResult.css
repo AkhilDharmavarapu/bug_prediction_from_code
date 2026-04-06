@@ -9,6 +9,46 @@
   margin-bottom: 24px;
 }
 
+/* Result Header Controls */
+.result-header-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.btn-download-report {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.15);
+}
+
+.btn-download-report:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+}
+
+.btn-download-report:active {
+  transform: translateY(0);
+}
+
+.btn-download-report:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Risk Card */
 .risk-card {
   padding: 28px;

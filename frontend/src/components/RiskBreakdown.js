@@ -1,7 +1,142 @@
 import React from 'react';
 import './RiskBreakdown.css';
 
-function RiskBreakdown({ metrics, riskScore, prediction }) {
+function RiskBreakdown({ metrics, riskScore, prediction, featureImportance }) {
+  // ========================================================================
+  // FEATURE IMPORTANCE MAPPING - Each feature gets one clear recommendation
+  // ========================================================================
+  
+  const featureRecommendations = {
+    'loc': {
+      name: 'Lines of Code',
+      recommendation: 'Break large files into smaller functions/modules to reduce complexity',
+      emoji: '📄'
+    },
+    'v(g)': {
+      name: 'Cyclomatic Complexity',
+      recommendation: 'Reduce cyclomatic complexity by simplifying conditional logic and extracting methods',
+      emoji: '🔄'
+    },
+    'v': {
+      name: 'Code Volume',
+      recommendation: 'Refactor repetitive code and reduce overall code size through better abstractions',
+      emoji: '📊'
+    },
+    'd': {
+      name: 'Implementation Difficulty',
+      recommendation: 'Simplify implementation logic to improve code clarity and maintainability',
+      emoji: '🔧'
+    },
+    'e': {
+      name: 'Mental Effort',
+      recommendation: 'Reduce cognitive load by simplifying complex code structures and adding documentation',
+      emoji: '🧠'
+    },
+    'ev(g)': {
+      name: 'Essential Complexity',
+      recommendation: 'Review and optimize code structure to reduce essential complexity',
+      emoji: '⚙️'
+    },
+    'iv(g)': {
+      name: 'IV(g) Metric',
+      recommendation: 'Improve code structure and design patterns to optimize this metric',
+      emoji: '🏗️'
+    },
+    'n': {
+      name: 'Number of Operators',
+      recommendation: 'Optimize operator usage and consider refactoring complex expressions',
+      emoji: '➕'
+    }
+  };
+
+  // ========================================================================
+  // METRIC DESCRIPTIONS - Why each metric contributes to bug risk
+  // ========================================================================
+  
+  const metricDescriptions = {
+    'loc': 'Larger codebases are harder to test and more prone to bugs.',
+    'v': 'High code volume increases complexity and likelihood of defects.',
+    'e': 'High mental effort increases cognitive load and risk of mistakes.',
+    'd': 'Higher implementation difficulty increases chance of defects.',
+    'n': 'More operators increase code complexity and error probability.',
+    'v(g)': 'Higher cyclomatic complexity means more execution paths to test.',
+    'ev(g)': 'Higher essential complexity indicates poor structural design.',
+    'iv(g)': 'Higher integration complexity makes systems harder to maintain.'
+  };
+
+  // ========================================================================
+  // GENERATE ACTION PLAN FROM FEATURE IMPORTANCE
+  // ========================================================================
+  
+  const generateActionPlan = () => {
+    if (!featureImportance || Object.keys(featureImportance).length === 0) {
+      return [];
+    }
+
+    // Convert feature importance to array and sort by importance (descending)
+    const sortedFeatures = Object.entries(featureImportance)
+      .map(([feature, importance]) => ({
+        feature,
+        importance,
+        ...featureRecommendations[feature] || {
+          name: feature,
+          recommendation: 'Review and optimize code structure for this metric',
+          emoji: '📋'
+        }
+      }))
+      .sort((a, b) => b.importance - a.importance);
+
+    // Assign priorities: top 2 = P1, next 2 = P2, rest = P3
+    return sortedFeatures.map((item, index) => {
+      let priority, priorityLabel, priorityClass;
+      
+      if (index < 2) {
+        priority = 1;
+        priorityLabel = 'Priority 1';
+        priorityClass = 'critical-action';
+      } else if (index < 4) {
+        priority = 2;
+        priorityLabel = 'Priority 2';
+        priorityClass = 'warning-action';
+      } else {
+        priority = 3;
+        priorityLabel = 'Priority 3';
+        priorityClass = 'safe-action';
+      }
+      
+      return {
+        ...item,
+        priority,
+        priorityLabel,
+        priorityClass
+      };
+    });
+  };
+
+  const actionPlan = generateActionPlan();
+
+  // ========================================================================
+  // GENERATE TOP RISK DRIVERS FROM FEATURE IMPORTANCE
+  // ========================================================================
+  
+  const getTopRiskDrivers = () => {
+    if (!featureImportance || Object.keys(featureImportance).length === 0) {
+      return [];
+    }
+
+    return Object.entries(featureImportance)
+      .map(([feature, importance]) => ({
+        feature,
+        importance,
+        name: featureRecommendations[feature]?.name || feature,
+        description: metricDescriptions[feature] || 'This metric influences bug probability.'
+      }))
+      .sort((a, b) => b.importance - a.importance)
+      .slice(0, 3);
+  };
+
+  const topRiskDrivers = getTopRiskDrivers();
+
   // Analyze which metrics are problematic
   const analyzeMetrics = () => {
     const analysis = [];
@@ -209,10 +344,62 @@ function RiskBreakdown({ metrics, riskScore, prediction }) {
   const totalContribution = metrics_analysis.reduce((sum, m) => sum + m.contribution, 0);
 
   // Normalize contributions to percentages
-  const normalizedMetrics = metrics_analysis.map(m => ({
-    ...m,
-    percentage: totalContribution > 0 ? ((m.contribution / totalContribution) * 100).toFixed(1) : 0
-  }));
+  let normalizedMetrics;
+  
+  if (featureImportance && Object.keys(featureImportance).length > 0) {
+    // Use feature importance from backend (already in percentage format)
+    const featureImportanceArray = Object.entries(featureImportance)
+      .map(([feature, importance]) => {
+        // Find metricAnalysis - handle case-insensitive matching
+        let metricAnalysis = metrics_analysis.find(m => 
+          m.metric.toLowerCase() === feature.toLowerCase() || 
+          m.name.toLowerCase().includes(feature.replace(/[()]/g, '').toLowerCase())
+        );
+        
+        // If found, merge with new data; otherwise create a minimal entry
+        if (metricAnalysis) {
+          return {
+            ...metricAnalysis,
+            contribution: importance / 100,  // Convert percentage to proportion for display
+            percentage: importance.toFixed(1)
+          };
+        } else {
+          // Create minimal entry for backend feature
+          return {
+            metric: feature,
+            name: feature,
+            value: 'N/A',
+            status: 'warning',
+            severity: 'Medium',
+            message: 'Feature from ML model',
+            impact: 'Model identified as important factor',
+            suggestion: 'Review code for this metric',
+            contribution: importance / 100,
+            percentage: importance.toFixed(1)
+          };
+        }
+      })
+      .filter(m => m);
+
+    // CRITICAL FIX: Deduplicate by feature name - keep only the first (highest importance) occurrence
+    const seenFeatures = new Set();
+    const dedupedMetrics = featureImportanceArray.filter(m => {
+      const featureKey = (m.metric || m.name).toLowerCase();
+      if (seenFeatures.has(featureKey)) {
+        return false; // Skip duplicate
+      }
+      seenFeatures.add(featureKey);
+      return true;
+    });
+
+    normalizedMetrics = dedupedMetrics.sort((a, b) => b.contribution - a.contribution);
+  } else {
+    // Fall back to calculated contributions
+    normalizedMetrics = metrics_analysis.map(m => ({
+      ...m,
+      percentage: totalContribution > 0 ? ((m.contribution / totalContribution) * 100).toFixed(1) : 0
+    }));
+  }
 
   return (
     <div className="risk-breakdown">
@@ -237,15 +424,34 @@ function RiskBreakdown({ metrics, riskScore, prediction }) {
         </div>
       )}
 
+      {/* Top Risk Drivers */}
+      {topRiskDrivers.length > 0 && (
+        <div className="top-risk-drivers">
+          <h3 className="drivers-title">🎯 Top Risk Drivers (Model-Based)</h3>
+          <div className="drivers-list">
+            {topRiskDrivers.map((driver, idx) => (
+              <div key={driver.feature} className="driver-item">
+                <div className="driver-header">
+                  <span className="driver-rank">{idx + 1}.</span>
+                  <span className="driver-name">{driver.name}</span>
+                  <span className="driver-importance">{driver.importance.toFixed(1)}%</span>
+                </div>
+                <p className="driver-description">{driver.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Risk Contributors Breakdown */}
-      <div className="breakdown-container">
+      <div className="risk-analysis-layout">
         <div className="breakdown-chart">
           <h3 className="chart-title">Risk Contributors</h3>
           <p className="chart-subtitle">How each metric affects bug probability</p>
           
           <div className="risk-bars">
-            {normalizedMetrics.map((metric, idx) => (
-              <div key={idx} className="risk-bar-item">
+            {normalizedMetrics.map((metric) => (
+              <div key={metric.metric} className="risk-bar-item">
                 <div className="bar-header">
                   <span className="bar-label">{metric.metric}</span>
                   <span className={`bar-badge badge-${metric.status}`}>
@@ -275,8 +481,8 @@ function RiskBreakdown({ metrics, riskScore, prediction }) {
           <h3 className="details-title">Detailed Analysis</h3>
           
           <div className="metric-details">
-            {normalizedMetrics.map((metric, idx) => (
-              <div key={idx} className={`detail-card detail-${metric.status}`}>
+            {normalizedMetrics.map((metric) => (
+              <div key={metric.metric} className={`detail-card detail-${metric.status}`}>
                 <div className="detail-header">
                   <span className="detail-metric">{metric.metric}</span>
                   <span className="detail-name">{metric.name}</span>
@@ -321,25 +527,21 @@ function RiskBreakdown({ metrics, riskScore, prediction }) {
       <div className="action-plan">
         <h3 className="plan-title">🎯 Recommended Action Plan</h3>
         
-        <ol className="action-list">
-          {normalizedMetrics.filter(m => m.status === 'critical').map((m, idx) => (
-            <li key={idx} className="action-item critical-action">
-              <span className="action-priority">Priority 1:</span> Fix <strong>{m.name}</strong> - {m.suggestion}
-            </li>
-          ))}
-          
-          {normalizedMetrics.filter(m => m.status === 'warning').map((m, idx) => (
-            <li key={idx} className="action-item warning-action">
-              <span className="action-priority">Priority 2:</span> Address <strong>{m.name}</strong> - {m.suggestion}
-            </li>
-          ))}
-
-          {normalizedMetrics.filter(m => m.status === 'safe').slice(0, 2).map((m, idx) => (
-            <li key={idx} className="action-item safe-action">
-              <span className="action-priority">Maintain:</span> Keep <strong>{m.name}</strong> quality
-            </li>
-          ))}
-        </ol>
+        {actionPlan.length > 0 ? (
+          <ol className="action-list">
+            {actionPlan.map((item, idx) => (
+              <li key={item.feature} className={`action-item ${item.priorityClass}`}>
+                <span className="action-priority">{item.priorityLabel}:</span>
+                <span className="action-emoji">{item.emoji}</span>
+                <span className="action-feature"><strong>{item.name}</strong></span>
+                <span className="action-importance">({item.importance.toFixed(1)}%)</span>
+                <span className="action-text">{item.recommendation}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="action-empty">No action items available</p>
+        )}
       </div>
 
       {/* Summary Stats */}

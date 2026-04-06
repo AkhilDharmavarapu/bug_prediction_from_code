@@ -17,3 +17,5 @@ build/
 .pytest_cache/
 .coverage
 .npm
+payload.json
+test_*.py
